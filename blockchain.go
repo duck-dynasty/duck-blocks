@@ -59,3 +59,36 @@ func Hash(block Block) string {
 
 	return d
 }
+
+func (b *Blockchain) ProofOfWork(lastProof string) string {
+	proof := 0
+
+	for !ValidProof(lastProof, string(proof)) {
+		proof += 1
+	}
+
+	return fmt.Sprintf("%d", proof)
+}
+
+func ValidProof(lastProof string, proof string) bool {
+	guess := fmt.Sprintf("%s%s", lastProof, proof)
+	guessHash := md5.Sum([]byte(guess))
+	guessHex := fmt.Sprintf("%x", guessHash)
+
+	if string(guessHex[0]) == "0" {
+		return true
+	} else {
+		return false
+	}
+}
+
+func NewBlockchain() Blockchain {
+	blockchain := Blockchain{
+		Chain:               []Block{},
+		CurrentTransactions: []Transaction{},
+	}
+
+	_ = blockchain.NewBlock("100", "1")
+
+	return blockchain
+}
